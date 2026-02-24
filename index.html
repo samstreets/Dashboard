@@ -249,7 +249,13 @@ async function loadKuma() {
       (group.monitorList || []).forEach(m => {
         const id   = m.id;
         const hbArr = heartbeatList[id];
-        const hb    = (hbArr && hbArr.length) ? hbArr[0] : null;
+        // Kuma may return heartbeats in either order — pick the most recent by timestamp
+        let hb = null;
+        if (hbArr && hbArr.length) {
+          hb = hbArr.reduce((latest, cur) =>
+            new Date(cur.time) > new Date(latest.time) ? cur : latest
+          );
+        }
         const status = hb ? hb.status : 2;
         const upKey = id + "_24";
         const uptime = uptimeList.hasOwnProperty(upKey)
