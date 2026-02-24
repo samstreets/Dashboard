@@ -268,6 +268,7 @@ setInterval(updateClock, 1000);
 updateClock();
 
 /* ─── UPTIME KUMA ─── */
+
 async function loadKuma() {
   const grid = document.getElementById('monitors-grid');
   const summ = document.getElementById('kuma-summary');
@@ -275,41 +276,52 @@ async function loadKuma() {
   summ.innerHTML = '';
 
   try {
+    // Base URLs
     const listURL = CONFIG.uptimeKumaUrl;
     const hbURL   = listURL.replace("/status-page/", "/status-page/heartbeat/");
 
-    const listRes = await fetch(CONFIG.corsProxy + listURL);
-    const hbRes   = await fetch(CONFIG.corsProxy + hbURL);
+    // Prefix-proxy
+    const listRes = await fetch(CONFIG.corsProxy + listURL, { cache: 'no-store' });
+    const hbRes   = await fetch(CONFIG.corsProxy + hbURL,  { cache: 'no-store' });
+
+    if (!listRes.ok) throw new Error("LIST HTTP " + listRes.status);
+    if (!hbRes.ok)   throw new Error("HEARTBEAT HTTP " + hbRes.status);
 
     const listData = await listRes.json();
     const hbData   = await hbRes.json();
 
     const monitors = [];
     const heartbeatList = hbData.heartbeatList || {};
-    const uptimeList = hbData.uptimeList || {};
+    const uptimeList    = hbData.uptimeList || {};
 
-    (listData.publicGroupList || []).forEach(g => {
-      (g.monitorList || []).forEach(m => {
+    // Build monitor array
+    (listData.publicGroupList || []).forEach(group => {
+      (group.monitorList || []).forEach(m => {
         const id = m.id;
 
-// live heartbeat for this monitor
-const hb = heartbeatList[id] && heartbeatList[id][0] ? heartbeatList[id][0] : null;
+        // The most recent heartbeat
+        const hbArr = heartbeatList[id];
+        const hb    = (hbArr && hbArr.length) ? hbArr[0] : null;
 
-// LIVE status from Kuma
-const status = hb ? hb.status : 2;   // 1=UP immediately after heartbeat
+        // REAL LIVE STATUS — ignore uptime
+        // 1 = up, 0 = down, 2 = pending, 3 = maintenance
+        const status = hb ? hb.status : 2;
 
-// optional uptime (24h), not used for live status
-const upKey = id + "_24";
-const uptime = uptimeList[upKey] != null
-  ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
-  : null;
+        // Optional uptime (cosmetic only)
+        const upKey = id + "_24";
+        const uptime = uptimeList.hasOwnProperty(upKey)
+          ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
+          : null;
 
-monitors.push({
-  name: m.name,
-  status: status,   // <-- This is the important change
-  uptime: uptime,   // purely cosmetic
-});
+        monitors.push({
+          name: m.name,
+          status: status,
+          uptime: uptime
+        });
+      });
+    });
 
+    // Render to UI
     renderMonitors(monitors, grid, summ);
     updateSysStatus(monitors);
 
@@ -318,7 +330,7 @@ monitors.push({
       `<div class="error-msg">⚠ KUMA ERROR — ${err.message}</div>`;
   }
 }
-  
+
 function renderMonitors(monitors, grid, summ) {
   const up   = monitors.filter(m => m.status === 1).length;
   const down = monitors.filter(m => m.status === 0).length;
