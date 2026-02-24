@@ -291,17 +291,24 @@ async function loadKuma() {
     (listData.publicGroupList || []).forEach(g => {
       (g.monitorList || []).forEach(m => {
         const id = m.id;
-        const hb = (heartbeatList[id] && heartbeatList[id][0]) || null;
 
-        const status = hb?.status ?? 2; // 2 = pending
-        const upKey = id + "_24";
-        const uptime = uptimeList[upKey] != null
-          ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
-          : null;
+// live heartbeat for this monitor
+const hb = heartbeatList[id] && heartbeatList[id][0] ? heartbeatList[id][0] : null;
 
-        monitors.push({ name: m.name, status, uptime });
-      });
-    });
+// LIVE status from Kuma
+const status = hb ? hb.status : 2;   // 1=UP immediately after heartbeat
+
+// optional uptime (24h), not used for live status
+const upKey = id + "_24";
+const uptime = uptimeList[upKey] != null
+  ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
+  : null;
+
+monitors.push({
+  name: m.name,
+  status: status,   // <-- This is the important change
+  uptime: uptime,   // purely cosmetic
+});
 
     renderMonitors(monitors, grid, summ);
     updateSysStatus(monitors);
