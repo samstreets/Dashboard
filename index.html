@@ -156,7 +156,7 @@ const CONFIG = {
   // API format: https://YOUR_KUMA_HOST/api/status-page/YOUR_SLUG
   // Example: "https://status.yourdomain.com/api/status-page/main"
   // Leave "" to show demo data.
-  uptimeKumaUrl: "https://tight-wildflower-d4f9.samuel-streets.workers.dev/dashboard",
+  uptimeKumaUrl: "https://tight-wildflower-d4f9.samuel-streets.workers.dev/Api/status-page/default",
 
   // If Kuma is on a private network and you get CORS errors:
   // corsProxy: "https://corsproxy.io/?"
@@ -178,40 +178,43 @@ const CONFIG = {
   // icon: emoji string, or a full image URL / favicon path
   apps: [
     // — Internal / Homelab —
-    { name: "Uptime Kuma",  url: "https://uptime.local",         icon: "📡", type: "internal" },
-    { name: "Portainer",    url: "https://portainer.local:9000", icon: "🐳", type: "internal" },
-    { name: "Proxmox",      url: "https://proxmox.local:8006",   icon: "🖥️", type: "internal" },
-    { name: "Home Assist",  url: "https://homeassistant.local",  icon: "🏠", type: "internal" },
-    { name: "Grafana",      url: "https://grafana.local:3000",   icon: "📊", type: "internal" },
-    { name: "Jellyfin",     url: "https://jellyfin.local",       icon: "🎬", type: "internal" },
-    { name: "Nextcloud",    url: "https://cloud.local",          icon: "☁️", type: "internal" },
-    { name: "PiHole",       url: "http://pihole.local/admin",    icon: "🔒", type: "internal" },
-    { name: "Vaultwarden",  url: "https://vault.local",          icon: "🔑", type: "internal" },
-    { name: "Traefik",      url: "https://traefik.local",        icon: "🌐", type: "internal" },
-    { name: "Bezel",        url: "https://bezel.local",          icon: "🔔", type: "internal" },
+    { name: "Bezel",        url: "https://beszel.streetsservices.co.uk",            icon: "🔔", type: "internal" },
+    { name: "Bazarr",       url: "https://bazarr.streetsservices.co.uk/",           icon: "🏠", type: "internal" },
+    { name: "Crafty",       url: "https://crafty.streetsservices.co.uk",            icon: "☁️", type: "internal" },
+    { name: "Gotify",       url: "https://gotify.streetsservices.co.uk/#/login",    icon: "🌐", type: "internal" },
+    { name: "Immich",       url: "https://immich.streetsservices.co.uk/photos",     icon: "▶️", type: "internal" },
+    { name: "Lidarr",       url: "https://lidarr.streetsservices.co.uk/",           icon: "🔒", type: "internal" },
+    { name: "Overseerr",    url: "https://overseerr.streetsservices.co.uk/login",   icon: "🔑", type: "internal" },
+    { name: "Prowlar",      url: "https://prowlarr.streetsservices.co.uk/",         icon: "🔔", type: "internal" },
+    { name: "Proxmox",      url: "https://192.168.25.15:8006/",                     icon: "🖥️", type: "internal" },
+    { name: "Portainer",    url: "https://portainer.streetsservices.co.uk/#!/auth", icon: "🐳", type: "internal" },
+    { name: "Plex",         url: "https://app.plex.tv/desktop",                     icon: "🎬", type: "internal" },
+    { name: "QBittorent",   url: "https://qbittorrent.streetsservices.co.uk/",      icon: "📊", type: "internal" },
+    { name: "Radarr",       url: "https://radarr.streetsservices.co.uk/",           icon: "🔔", type: "internal" },
+    { name: "Sonarr",       url: "https://sonarr.streetsservices.co.uk/",           icon: "🔔", type: "internal" },
+    { name: "Tautulli",     url: "https://tautulli.streetsservices.co.uk/home",     icon: "🔔", type: "internal" },
+    { name: "Tdarr",        url: "https://tdarr.streetsservices.co.uk/#/",          icon: "🔔", type: "internal" },
+    { name: "Uptime Kuma",  url: "https://kuma.streetsservices.co.uk/dashboard",    icon: "📡", type: "internal" },
+    { name: "Your Spotify", url: "https://spotify.streetsservices.co.uk/",          icon: "📡", type: "internal" },
     // — External / Public —
-    { name: "GitHub",       url: "https://github.com",           icon: "🐙", type: "public" },
-    { name: "ChatGPT",      url: "https://chat.openai.com",      icon: "🤖", type: "public" },
-    { name: "Google",       url: "https://google.com",           icon: "🔍", type: "public" },
-    { name: "Gmail",        url: "https://mail.google.com",      icon: "📧", type: "public" },
-    { name: "YouTube",      url: "https://youtube.com",          icon: "▶️", type: "public" },
+    { name: "GitHub",       url: "https://github.com/samstreets",           icon: "🐙", type: "public" },
+    { name: "Claude",       url: "https://claude.ai/",                      icon: "🤖", type: "public" },
+    { name: "Google",       url: "https://google.com",                      icon: "🔍", type: "public" },
+    { name: "Gmail",        url: "https://mail.google.com",                 icon: "📧", type: "public" },
+    { name: "Pass Portal",  url: "https://pass.proton.me/u/5/share/",       icon: "🔑", type: "internal" },
   ]
 };
 </script>
 <!-- ============================================================ -->
 
 <header>
-  <div class="logo" id="dash-logo">NEXUS</div>
+  <div class="logo" id="dash-logo">Dashboard</div>
   <div class="sys-status" id="sys-status">SYSTEM <span class="ok">NOMINAL</span></div>
   <div class="header-right">
     <div class="clock" id="clock">--:--:--</div>
     <div class="dateline" id="dateline">--- -- ----</div>
   </div>
 </header>
-
-<div class="config-notice" id="config-notice">
-  ⚠ &nbsp;DEMO MODE — set <code>uptimeKumaUrl</code> and <code>bezelUrl</code> in the CONFIG block above.
-</div>
 
 <div class="main-grid">
 
