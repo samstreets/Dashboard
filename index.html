@@ -298,16 +298,29 @@ async function loadKuma() {
     return;
   }
   try {
-    const res  = await fetch(CONFIG.corsProxy + CONFIG.uptimeKumaUrl);
+    const listRes = await fetch(CONFIG.corsProxy + CONFIG.uptimeKumaUrl);
+    const hbRes   = await fetch(CONFIG.corsProxy + CONFIG.uptimeK
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const monitors = [];
     (data.publicGroupList || []).forEach(g => {
       (g.monitorList || []).forEach(m => {
+        const id = m.id;
+        const hbList = hbData.heartbeatList[id];
+        const hb = hbList ? hbList[0] : null;
+
+        // status: 0 = down, 1 = up, 2 = pending, 3 = maintenance
+        const status = hb ? hb.status : 2;
+
+        // uptime for 24h (if exists)
+        const uptimeKey = id + "_24";
+        const uptime = hbData.uptimeList[uptimeKey];
+        const uptimePct = uptime != null ? parseFloat((uptime * 100).toFixed(2)) : null;
+        
         monitors.push({
-          name:   m.name,
-          status: m.status,
-          uptime: typeof m.uptime === 'number' ? parseFloat((m.uptime * 100).toFixed(2)) : null
+          name: m.name,
+          status,
+          uptime: uptimePct
         });
       });
     });
