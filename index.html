@@ -48,12 +48,8 @@
   .clock{font-family:var(--fmono);font-size:.85rem;color:var(--cyan);letter-spacing:.1em}
   .dateline{font-family:var(--fmono);font-size:.6rem;color:var(--muted);letter-spacing:.08em;margin-top:2px}
 
-  /* CONFIG NOTICE */
-  .config-notice{background:rgba(245,196,0,.05);border:1px solid rgba(245,196,0,.25);border-left:3px solid var(--yellow);border-radius:4px;padding:10px 14px;font-family:var(--fmono);font-size:.68rem;color:var(--yellow);margin-bottom:20px;display:none;gap:10px;align-items:center}
-
-  /* MAIN GRID */
-  .main-grid{display:grid;grid-template-columns:1fr 300px;gap:14px}
-  @media(max-width:960px){.main-grid{grid-template-columns:1fr}}
+  /* MAIN GRID — full width now that alerts panel is gone */
+  .main-grid{display:grid;grid-template-columns:1fr;gap:14px}
 
   /* CARD */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:18px;position:relative;animation:fadeUp .5s ease both;overflow:hidden}
@@ -94,22 +90,7 @@
   .uptime-fill.down{background:var(--down)}
   .uptime-fill.pending{background:var(--pending)}
 
-  /* ALERTS */
-  #alerts-list{display:flex;flex-direction:column;gap:8px;max-height:440px;overflow-y:auto}
-  #alerts-list::-webkit-scrollbar{width:4px}
-  #alerts-list::-webkit-scrollbar-track{background:var(--surface2)}
-  #alerts-list::-webkit-scrollbar-thumb{background:var(--borderg)}
-  .alert-item{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:10px 12px;position:relative;overflow:hidden;animation:fadeUp .3s ease both}
-  .alert-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--magenta);box-shadow:0 0 8px var(--magenta)}
-  .alert-item.resolved::before{background:var(--up);box-shadow:0 0 8px var(--up)}
-  .alert-severity{font-family:var(--fmono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--magenta);margin-bottom:3px}
-  .alert-item.resolved .alert-severity{color:var(--up)}
-  .alert-title{font-size:.82rem;font-weight:700;margin-bottom:3px;color:var(--text)}
-  .alert-time{font-family:var(--fmono);font-size:.6rem;color:var(--muted)}
-  .no-alerts{text-align:center;padding:32px 0;color:var(--up);font-family:var(--fmono);font-size:.72rem;letter-spacing:.1em}
-
   /* SHORTCUTS */
-  #shortcuts-card{grid-column:1/-1}
   .apps-section{margin-bottom:18px}
   .apps-section:last-child{margin-bottom:0}
   .apps-section-label{font-family:var(--fmono);font-size:.58rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px}
@@ -151,57 +132,39 @@ const CONFIG = {
   title: "NEXUS",
 
   // ── Uptime Kuma ──────────────────────────────────────────────
-  // Your public Uptime Kuma Status Page API URL.
-  // In Kuma: Status Pages → your page → the slug is in the URL.
-  // API format: https://YOUR_KUMA_HOST/api/status-page/YOUR_SLUG
-  // Example: "https://status.yourdomain.com/api/status-page/main"
-  // Leave "" to show demo data.
   uptimeKumaUrl: "https://kuma.streetsservices.co.uk/api/status-page/default",
-
-  // If Kuma is on a private network and you get CORS errors:
-  // corsProxy: "https://corsproxy.io/?"
   corsProxy: "https://tight-wildflower-d4f9.samuel-streets.workers.dev/",
 
   // Auto-refresh interval in seconds (0 = disabled)
   refreshInterval: 60,
 
-  // ── Bezel ────────────────────────────────────────────────────
-  // Your Bezel alerts API endpoint.
-  // Expected JSON: array of { title, time, resolved, severity? }
-  // Example: "https://bezel.yourdomain.com/api/v1/alerts"
-  // Leave "" to show demo alerts.
-  bezelUrl: "https://beszel.streetsservices.co.uk/api/v1/alerts",
-
   // ── App Shortcuts ─────────────────────────────────────────────
-  // type: "internal" = homelab/local (magenta glow on hover)
-  //       "public"   = external web app (cyan glow on hover)
-  // icon: emoji string, or a full image URL / favicon path
   apps: [
     // — Internal / Homelab —
-    { name: "Bezel",        url: "https://beszel.streetsservices.co.uk",            icon: "🔔", type: "internal" },
-    { name: "Bazarr",       url: "https://bazarr.streetsservices.co.uk/",           icon: "🏠", type: "internal" },
-    { name: "Crafty",       url: "https://crafty.streetsservices.co.uk",            icon: "☁️", type: "internal" },
-    { name: "Gotify",       url: "https://gotify.streetsservices.co.uk/#/login",    icon: "🌐", type: "internal" },
-    { name: "Immich",       url: "https://immich.streetsservices.co.uk/photos",     icon: "▶️", type: "internal" },
-    { name: "Lidarr",       url: "https://lidarr.streetsservices.co.uk/",           icon: "🔒", type: "internal" },
-    { name: "Overseerr",    url: "https://overseerr.streetsservices.co.uk/login",   icon: "🔑", type: "internal" },
-    { name: "Prowlar",      url: "https://prowlarr.streetsservices.co.uk/",         icon: "🔔", type: "internal" },
+    { name: "Beszel",       url: "https://beszel.streetsservices.co.uk",            icon: "📊", type: "internal" },
+    { name: "Bazarr",       url: "https://bazarr.streetsservices.co.uk/",           icon: "💬", type: "internal" },
+    { name: "Crafty",       url: "https://crafty.streetsservices.co.uk",            icon: "⛏️", type: "internal" },
+    { name: "Gotify",       url: "https://gotify.streetsservices.co.uk/#/login",    icon: "🔔", type: "internal" },
+    { name: "Immich",       url: "https://immich.streetsservices.co.uk/photos",     icon: "🖼️", type: "internal" },
+    { name: "Lidarr",       url: "https://lidarr.streetsservices.co.uk/",           icon: "🎵", type: "internal" },
+    { name: "Overseerr",    url: "https://overseerr.streetsservices.co.uk/login",   icon: "🎬", type: "internal" },
+    { name: "Prowlarr",     url: "https://prowlarr.streetsservices.co.uk/",         icon: "🔍", type: "internal" },
     { name: "Proxmox",      url: "https://192.168.25.15:8006/",                     icon: "🖥️", type: "internal" },
     { name: "Portainer",    url: "https://portainer.streetsservices.co.uk/#!/auth", icon: "🐳", type: "internal" },
-    { name: "Plex",         url: "https://app.plex.tv/desktop",                     icon: "🎬", type: "internal" },
-    { name: "QBittorent",   url: "https://qbittorrent.streetsservices.co.uk/",      icon: "📊", type: "internal" },
-    { name: "Radarr",       url: "https://radarr.streetsservices.co.uk/",           icon: "🔔", type: "internal" },
-    { name: "Sonarr",       url: "https://sonarr.streetsservices.co.uk/",           icon: "🔔", type: "internal" },
-    { name: "Tautulli",     url: "https://tautulli.streetsservices.co.uk/home",     icon: "🔔", type: "internal" },
-    { name: "Tdarr",        url: "https://tdarr.streetsservices.co.uk/#/",          icon: "🔔", type: "internal" },
-    { name: "Uptime Kuma",  url: "https://kuma.streetsservices.co.uk/dashboard",    icon: "📡", type: "internal" },
-    { name: "Your Spotify", url: "https://spotify.streetsservices.co.uk/",          icon: "📡", type: "internal" },
+    { name: "Plex",         url: "https://app.plex.tv/desktop",                     icon: "▶️", type: "internal" },
+    { name: "qBittorrent",  url: "https://qbittorrent.streetsservices.co.uk/",      icon: "⬇️", type: "internal" },
+    { name: "Radarr",       url: "https://radarr.streetsservices.co.uk/",           icon: "🎞️", type: "internal" },
+    { name: "Sonarr",       url: "https://sonarr.streetsservices.co.uk/",           icon: "📡", type: "internal" },
+    { name: "Tautulli",     url: "https://tautulli.streetsservices.co.uk/home",     icon: "📈", type: "internal" },
+    { name: "Tdarr",        url: "https://tdarr.streetsservices.co.uk/#/",          icon: "🗜️", type: "internal" },
+    { name: "Uptime Kuma",  url: "https://kuma.streetsservices.co.uk/dashboard",    icon: "💓", type: "internal" },
+    { name: "Your Spotify", url: "https://spotify.streetsservices.co.uk/",          icon: "🎧", type: "internal" },
     // — External / Public —
     { name: "GitHub",       url: "https://github.com/samstreets",           icon: "🐙", type: "public" },
     { name: "Claude",       url: "https://claude.ai/",                      icon: "🤖", type: "public" },
     { name: "Google",       url: "https://google.com",                      icon: "🔍", type: "public" },
     { name: "Gmail",        url: "https://mail.google.com",                 icon: "📧", type: "public" },
-    { name: "Pass Portal",  url: "https://pass.proton.me/u/5/share/",       icon: "🔑", type: "internal" },
+    { name: "Pass Portal",  url: "https://pass.proton.me/u/5/share/",       icon: "🔐", type: "internal" },
   ]
 };
 </script>
@@ -228,17 +191,8 @@ const CONFIG = {
     <div id="monitors-grid"><div class="loading-pulse">INITIALISING MONITORS</div></div>
   </div>
 
-  <!-- BEZEL ALERTS -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">BEZEL <span class="tag">// alerts</span></div>
-      <button class="refresh-btn" onclick="loadBezel()">↻ SYNC</button>
-    </div>
-    <div id="alerts-list"><div class="loading-pulse">SCANNING</div></div>
-  </div>
-
   <!-- APP SHORTCUTS -->
-  <div class="card" id="shortcuts-card">
+  <div class="card">
     <div class="card-header">
       <div class="card-title">QUICK ACCESS <span class="tag">// shortcuts</span></div>
     </div>
@@ -268,7 +222,6 @@ setInterval(updateClock, 1000);
 updateClock();
 
 /* ─── UPTIME KUMA ─── */
-
 async function loadKuma() {
   const grid = document.getElementById('monitors-grid');
   const summ = document.getElementById('kuma-summary');
@@ -276,11 +229,9 @@ async function loadKuma() {
   summ.innerHTML = '';
 
   try {
-    // Base URLs
     const listURL = CONFIG.uptimeKumaUrl;
     const hbURL   = listURL.replace("/status-page/", "/status-page/heartbeat/");
 
-    // Prefix-proxy
     const listRes = await fetch(CONFIG.corsProxy + listURL, { cache: 'no-store' });
     const hbRes   = await fetch(CONFIG.corsProxy + hbURL,  { cache: 'no-store' });
 
@@ -294,40 +245,25 @@ async function loadKuma() {
     const heartbeatList = hbData.heartbeatList || {};
     const uptimeList    = hbData.uptimeList || {};
 
-    // Build monitor array
     (listData.publicGroupList || []).forEach(group => {
       (group.monitorList || []).forEach(m => {
-        const id = m.id;
-
-        // The most recent heartbeat
+        const id   = m.id;
         const hbArr = heartbeatList[id];
         const hb    = (hbArr && hbArr.length) ? hbArr[0] : null;
-
-        // REAL LIVE STATUS — ignore uptime
-        // 1 = up, 0 = down, 2 = pending, 3 = maintenance
         const status = hb ? hb.status : 2;
-
-        // Optional uptime (cosmetic only)
         const upKey = id + "_24";
         const uptime = uptimeList.hasOwnProperty(upKey)
           ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
           : null;
-
-        monitors.push({
-          name: m.name,
-          status: status,
-          uptime: uptime
-        });
+        monitors.push({ name: m.name, status, uptime });
       });
     });
 
-    // Render to UI
     renderMonitors(monitors, grid, summ);
     updateSysStatus(monitors);
 
   } catch (err) {
-    grid.innerHTML =
-      `<div class="error-msg">⚠ KUMA ERROR — ${err.message}</div>`;
+    grid.innerHTML = `<div class="error-msg">⚠ KUMA ERROR — ${err.message}</div>`;
   }
 }
 
@@ -364,36 +300,6 @@ function updateSysStatus(monitors) {
     : 'SYSTEM <span class="ok">NOMINAL</span>';
 }
 
-/* ─── BEZEL ─── */
-async function loadBezel() {
-  const list = document.getElementById('alerts-list');
-  list.innerHTML = '<div class="loading-pulse">SCANNING ALERTS</div>';
-
-  if (!CONFIG.bezelUrl) { renderAlerts(DEMO_ALERTS, list); return; }
-  try {
-    const res  = await fetch(CONFIG.corsProxy + CONFIG.bezelUrl);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    renderAlerts(Array.isArray(data) ? data : (data.alerts || []), list);
-  } catch(e) {
-    list.innerHTML = '<div class="error-msg">⚠ BEZEL UNREACHABLE — ' + e.message + '</div>';
-  }
-}
-
-function renderAlerts(alerts, list) {
-  if (!alerts.length) {
-    list.innerHTML = '<div class="no-alerts">✓ ALL CLEAR — NO ACTIVE ALERTS</div>';
-    return;
-  }
-  list.innerHTML = alerts.map((a, i) =>
-    '<div class="alert-item' + (a.resolved ? ' resolved' : '') + '" style="animation-delay:' + (i * 0.05) + 's">' +
-      '<div class="alert-severity">' + (a.severity || (a.resolved ? 'RESOLVED' : 'ALERT')) + '</div>' +
-      '<div class="alert-title">' + a.title + '</div>' +
-      '<div class="alert-time">' + (a.time || '') + '</div>' +
-    '</div>'
-  ).join('');
-}
-
 /* ─── APP SHORTCUTS ─── */
 function renderApps() {
   const internal = CONFIG.apps.filter(a => a.type === 'internal');
@@ -421,9 +327,8 @@ function renderApps() {
 function init() {
   renderApps();
   loadKuma();
-  loadBezel();
   if (CONFIG.refreshInterval > 0)
-    setInterval(() => { loadKuma(); loadBezel(); }, CONFIG.refreshInterval * 1000);
+    setInterval(() => { loadKuma(); }, CONFIG.refreshInterval * 1000);
 }
 init();
 </script>
