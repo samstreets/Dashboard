@@ -256,24 +256,6 @@ const CONFIG = {
 </div><!-- /layout -->
 
 <script>
-/* ─── DEMO DATA ─── */
-const DEMO_MONITORS = [
-  {name:'Web Server',   status:1, uptime:99.95},
-  {name:'Database',     status:1, uptime:99.80},
-  {name:'API Gateway',  status:1, uptime:100  },
-  {name:'Mail Server',  status:0, uptime:87.20},
-  {name:'VPN',          status:1, uptime:99.99},
-  {name:'DNS Resolver', status:1, uptime:100  },
-  {name:'NAS Storage',  status:2, uptime:95.10},
-  {name:'Backup Agent', status:1, uptime:98.55},
-];
-const DEMO_ALERTS = [
-  {title:'Mail Server is DOWN',         time:'14 mins ago', resolved:false, severity:'CRITICAL'},
-  {title:'High CPU on node-01',          time:'1 hr ago',   resolved:false, severity:'WARNING' },
-  {title:'NAS disk usage above 85%',     time:'2 hrs ago',  resolved:false, severity:'WARNING' },
-  {title:'Backup completed with errors', time:'6 hrs ago',  resolved:true,  severity:'RESOLVED'},
-];
-
 /* ─── CLOCK ─── */
 function updateClock() {
   const n = new Date();
@@ -286,82 +268,50 @@ setInterval(updateClock, 1000);
 updateClock();
 
 /* ─── UPTIME KUMA ─── */
-
 async function loadKuma() {
   const grid = document.getElementById('monitors-grid');
   const summ = document.getElementById('kuma-summary');
   grid.innerHTML = '<div class="loading-pulse">FETCHING MONITORS</div>';
   summ.innerHTML = '';
 
-  if (!CONFIG.uptimeKumaUrl) {
-    // fall back to demo
-    renderMonitors(DEMO_MONITORS, grid, summ);
-    return;
-  }
-
   try {
-    // 1) Build the two URLs (list + heartbeat)
-    const listURL = CONFIG.uptimeKumaUrl; // e.g. https://kuma.../api/status-page/default
-    const hbURL   = listURL.replace('/status-page/', '/status-page/heartbeat/');
+    const listURL = CONFIG.uptimeKumaUrl;
+    const hbURL   = listURL.replace("/status-page/", "/status-page/heartbeat/");
 
-    // 2) Always go through your prefix proxy (workers.dev/)
-    const proxiedListURL = CONFIG.corsProxy + listURL;
-    const proxiedHbURL   = CONFIG.corsProxy + hbURL;
-
-    // Optional: debug in console
-    // console.log('Kuma list URL:', proxiedListURL);
-    // console.log('Kuma heartbeat URL:', proxiedHbURL);
-
-    // 3) Fetch both in parallel
-    const [listRes, hbRes] = await Promise.all([
-      fetch(proxiedListURL, { cache: 'no-store' }),
-      fetch(proxiedHbURL,   { cache: 'no-store' }),
-    ]);
-
-    if (!listRes.ok) throw new Error('LIST HTTP ' + listRes.status);
-    if (!hbRes.ok)   throw new Error('HEARTBEAT HTTP ' + hbRes.status);
+    const listRes = await fetch(CONFIG.corsProxy + listURL);
+    const hbRes   = await fetch(CONFIG.corsProxy + hbURL);
 
     const listData = await listRes.json();
     const hbData   = await hbRes.json();
 
-    // 4) Merge: build monitor array with status + uptime
     const monitors = [];
-    const heartbeatList = (hbData && hbData.heartbeatList) ? hbData.heartbeatList : {};
-    const uptimeList    = (hbData && hbData.uptimeList)    ? hbData.uptimeList    : {};
+    const heartbeatList = hbData.heartbeatList || {};
+    const uptimeList = hbData.uptimeList || {};
 
     (listData.publicGroupList || []).forEach(g => {
       (g.monitorList || []).forEach(m => {
         const id = m.id;
+        const hb = (heartbeatList[id] && heartbeatList[id][0]) || null;
 
-        // Last heartbeat for this monitor
-        const hbArr = heartbeatList[id];
-        const hb    = Array.isArray(hbArr) && hbArr.length ? hbArr[0] : null;
+        const status = hb?.status ?? 2; // 2 = pending
+        const upKey = id + "_24";
+        const uptime = uptimeList[upKey] != null
+          ? parseFloat((uptimeList[upKey] * 100).toFixed(2))
+          : null;
 
-        // status: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE
-        const status = hb ? hb.status : 2;
-
-        // uptime over 24h (if available) — API gives decimal 0..1
-        const upKey = id + '_24';
-        const upVal = uptimeList.hasOwnProperty(upKey) ? uptimeList[upKey] : null;
-        const uptimePct = (typeof upVal === 'number') ? parseFloat((upVal * 100).toFixed(2)) : null;
-
-        monitors.push({
-          name:   m.name,
-          status: status,
-          uptime: uptimePct
-        });
+        monitors.push({ name: m.name, status, uptime });
       });
     });
 
-    // 5) Render
-    renderMonitors(monitors.length ? monitors : DEMO_MONITORS, grid, summ);
+    renderMonitors(monitors, grid, summ);
     updateSysStatus(monitors);
 
-  } catch (e) {
-    grid.innerHTML = '<div class="error-msg">⚠ KUMA UNREACHABLE — ' + e.message + '. Check URL &amp; CORS in CONFIG.</div>';
+  } catch (err) {
+    grid.innerHTML =
+      `<div class="error-msg">⚠ KUMA ERROR — ${err.message}</div>`;
   }
 }
-
+  
 function renderMonitors(monitors, grid, summ) {
   const up   = monitors.filter(m => m.status === 1).length;
   const down = monitors.filter(m => m.status === 0).length;
